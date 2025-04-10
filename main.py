@@ -14,9 +14,6 @@ load_dotenv()
 # Configure the Gemini API
 model_id = os.getenv("GOOGLE_MODEL", "gemini-2.0-flash")
 
-# Load transaction history
-with open('plaid_transaction_history.json', 'r') as f:
-    transaction_history = json.load(f)
 
 app = FastAPI(title="Gemini Chat API")
 
@@ -48,20 +45,9 @@ async def chat(request: ChatRequest):
     try:
         client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
 
-        # Create system prompt with transaction history
-        system_prompt = f"""You are a Plaid Financial Advisor AI. You have access to the following transaction history:
-
-{json.dumps(transaction_history, indent=2)}
-
-Please analyze the transaction history and provide detailed insights based on the transaction data, including spending patterns, recurring expenses, and any notable financial behaviors."""
-
         google_search_tool = Tool(
             google_search = GoogleSearch()
         )
-
-        # # Create content array starting with system prompt
-        # contents = [{"role": "user", "parts": [{"text": system_prompt}]},
-        #             {"role": "model", "parts": [{"text": "I understand. Please provide your question."}]}]
 
         # Add chat history if provided
         contents = []
